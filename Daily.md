@@ -6,3 +6,6 @@
 ##2018.01.11
 >Maven打通了，注意先加cert然后master pwd然后普通pwd，注意setting.xml在golbal config，user config不要override。 太多野比jessie搞，需要balance一下， 2018.01.12 check下auto testing个jenkins setup.
 ***
+##2018.01.22
+>今日本来开会讲sprint又没搞，GitHUB的UAT setup没搞，jenkins也没搞，就sent了个mail给Jinu回了hcm然后拿到了contact，催了下albert，然后capture了两个cirr39的testacse，今日进展真是差！
+***
