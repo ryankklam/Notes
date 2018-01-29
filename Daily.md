@@ -9,3 +9,7 @@
 ##2018.01.22
 >今日本来开会讲sprint又没搞，GitHUB的UAT setup没搞，jenkins也没搞，就sent了个mail给Jinu回了hcm然后拿到了contact，催了下albert，然后capture了两个cirr39的testacse，今日进展真是差！
 ***
+
+##2018.01.29
+>今日同kyo chris午餐，问左下近况，risk真系黑。晚上回来单车革新路兜了一圈，什么精品店都没有了，礼物没买成。
+***
