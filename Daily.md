@@ -17,3 +17,11 @@
 ##2018.02.22
 >过年放per左好多日，沉迷辐射。今日了解了一点serverless的concept，感觉未必是很成熟，需要继续观察。
 ***
+
+##2018.02.26
+>就是plan了下一个sprint的task。Eric跟Mark抽到了大利是。Luis问了zookeeper如何handle几个node，答不上来。看了下chatbot的source，有简单的NLP。明天继续看看source
+***
+
+##2018.03.27
+>本来想迅速教jay ccode好个notifyDate的unittest，竟然发现mockito mock不了static method。转而引入powerMockito，用法不难，小米讲左两次个File load module，其实就是一个checkfile availablity的野,可以定好接口然后尝试code个简单sample给他（springboot ？）。 明天搞掂Jay坛野。
+***
