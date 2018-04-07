@@ -6,7 +6,6 @@
 ##2018.01.11
 >Maven打通了，注意先加cert然后master pwd然后普通pwd，注意setting.xml在golbal config，user config不要override。 太多野比jessie搞，需要balance一下， 2018.01.12 check下auto testing个jenkins setup.
 ***
-<<<<<<< HEAD
 
 ##2018.01.12-19
 >之前hk出差都是开会多，工作基本没怎么做。不过这周Jenkins setup通了，现在可以自动trigger build while push requst to branch. 下周可以看看G3deploy 或者 setup个AOC或VNM的UAT env in gitHUB
@@ -43,4 +42,17 @@
 ##2018.03.27
 >本来想迅速教jay ccode好个notifyDate的unittest，竟然发现mockito mock不了static method。转而引入powerMockito，用法不难，小米讲左两次个File load module，其实就是一个checkfile availablity的野,可以定好接口然后尝试code个简单sample给他（springboot ？）。 明天搞掂Jay坛野。
 ***
->>>>>>> af51753f962e1cdd9b9d12ec08d101bffffd77b7
+
+##2018.04.05
+>油猴真是好工具，竟然有一个老司机脚本，可以自动改网页样式，不需要翻页，自动getlinkfrom search engine,post to 115
+感觉稍加改动就可以自动返回smv的结果，值得一试。
+***
+
+##2018.04.07
+>SpringBoot用上手包括embed H2用起来真是很方便，今日也有看点Actora（资源endpoint）跟Spring Boot Admin（dashboard，非spring官方）
+配个简单入收json然后output db的操作，用jackson竟然失败，bean类field mark了private，而且没getter、setter
+Jackson deserialize:
+a public field
+non-public field with getter or setter
+明天搞好个api sample然后upload hithub，sent个mail出去给小米
+***
