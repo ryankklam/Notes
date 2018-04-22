@@ -366,7 +366,7 @@
                 //have_id: "INTEGER",
                 //索引编码
                 index_cd: "TEXT",
-                //创建时间
+                //创建时间kw
                 add_time: "DATETIME"
             });
 
@@ -413,9 +413,12 @@
         },
         javlibrary: {
             type: 0,
-            re: /(javlibrary|javlib3|look4lib|5avlib|javli6|j8vlib|j9lib|jav11b|ja14b|13vlib|j17v|j18ib).*\?v=.*/,
+            re: /(javlibrary|javlib3|look4lib|5avlib|javli6|j8vlib|j9lib|jav11b|ja14b|13vlib|j17v|j18ib|19lib).*\?v=.*/,//all new site name should add here
             vid: function () {
                 return $('#video_id')[0].getElementsByClassName('text')[0].innerHTML;
+            },
+            vtitle: function(){
+                return $('#video_title')[0].getElementsByTagName('a')[0].innerHTML;
             },
             proc: function () {
                 //insert_after('#video_info');
@@ -448,6 +451,8 @@
     let main_keys = Object.keys(main); //下面的不要出现
     main.cur_tab = null;
     main.cur_vid = '';
+    main.cur_vtitle = '';
+    main.cur_vtitleKey = '';
 
     // 瀑布流脚本使用类
     class Lock {
@@ -709,6 +714,46 @@
                         }
                     });
                 },
+                6: function (kw, cb) {
+                    kw = main.cur_vtitleKey;
+                    GM_xmlhttpRequest({
+                        method: "POST",
+                        url: "https://cnbtkitty.net/",
+                        data: "keyword=" + kw + "&hidden=true",
+                        headers: {
+                            "Content-Type": "application/x-www-form-urlencoded"
+                        },
+                        onload: function (result) {
+                            thirdparty.nong.search_engines.full_url = result.finalUrl;
+                            let doc = Common.parsetext(result.responseText);
+                            let data = [];
+                            let t = doc.getElementsByClassName("list-con");
+                            if (t) {
+                                for (let elem of t) {
+                                    data.push({
+                                        "title": elem.querySelector("dt a").textContent,
+                                        "maglink": elem.querySelector("dd a").href,
+                                        "size": elem.querySelector(".option span:nth-child(3) b").textContent,
+                                        "src": elem.querySelector("dt a").href,
+                                    });
+                                }
+                            }
+                            else {
+                                data.push({
+                                    "title": "没有找到磁链接",
+                                    "maglink": "",
+                                    "size": "0",
+                                    "src": result.finalUrl,
+                                });
+                            }
+                            cb(result.finalUrl, data);
+                        },
+                        onerror: function (e) {
+                            console.error(e);
+                            throw "search error";
+                        }
+                    });
+                },
             },
             // 挊
             magnet_table: {
@@ -727,7 +772,7 @@
                             var b = this.head.cloneNode(true);
                             if (i === 0) {
                                 var select = document.createElement("select");
-                                var ops = ["btso", "btdb", "nyaa.si", "btkitty", "torrentkitty", "btlibrary"];
+                                var ops = ["btso", "btdb", "nyaa.si", "btkitty", "torrentkitty", "btlibrary","byTitleKey"];
                                 var cur_index = GM_getValue("search_index", 0);
                                 for (var j = 0; j < ops.length; j++) {
                                     var op = document.createElement("option");
@@ -988,9 +1033,14 @@
                         if (v.type === 0) {
                             try {
                                 main.cur_vid = v.vid();
+                                main.cur_vtitle = v.vtitle();
+                                var strs = main.cur_vtitle.split(" ");
+                                main.cur_vtitleKey = strs[strs.length-1];
                             }
                             catch (e) {
                                 main.cur_vid = '';
+                                main.cur_vtitle = '';
+                                main.cur_vtitleKey = '';
                             }
                             if (main.cur_vid) {
                                 GM_addStyle([
@@ -1006,6 +1056,9 @@
                                 ].join(''));
                                 main.cur_tab = thirdparty.nong.magnet_table.full();
                                 console.log('挊的番号：', main.cur_vid);
+                                console.log('挊的Title：', main.cur_vtitle);
+                                var strs = main.cur_vtitle.split(" ");
+                                console.log('挊的Title关键字：', strs[strs.length-1]);
                                 v.proc();
 
                                 // console.log(main.cur_tab)
