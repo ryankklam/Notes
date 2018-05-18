@@ -69,6 +69,7 @@
 // @connect      btkitty.pet
 // @connect      cnbtkitty.com
 // @connect      cnbtkitty.net
+// @connect      cnbtkitty.org
 // @connect      www.torrentkitty.tv
 // @connect      btlibrary.pw
 // @connect      ja14b.com
@@ -603,7 +604,7 @@
                 3: function (kw, cb) {
                     GM_xmlhttpRequest({
                         method: "POST",
-                        url: "https://cnbtkitty.net/",
+                        url: "https://cnbtkitty.org/",
                         data: "keyword=" + kw + "&hidden=true",
                         headers: {
                             "Content-Type": "application/x-www-form-urlencoded"
@@ -718,7 +719,7 @@
                     kw = main.cur_vtitleKey;
                     GM_xmlhttpRequest({
                         method: "POST",
-                        url: "https://cnbtkitty.net/",
+                        url: "https://cnbtkitty.org/",
                         data: "keyword=" + kw + "&hidden=true",
                         headers: {
                             "Content-Type": "application/x-www-form-urlencoded"
