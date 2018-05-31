@@ -26,6 +26,9 @@
 // @include     http*://*13vlib.com/*
 // @include     http*://*j17v.com/*
 // @include     http*://*j18ib.com/*
+// @include     http*://*19lib.com/*
+// @include     http*://*j20a.com/*
+
 
 // @include     https://www.javbus.com/*
 // @include     https://www.javbus2.com/*
@@ -414,7 +417,7 @@
         },
         javlibrary: {
             type: 0,
-            re: /(javlibrary|javlib3|look4lib|5avlib|javli6|j8vlib|j9lib|jav11b|ja14b|13vlib|j17v|j18ib|19lib).*\?v=.*/,//all new site name should add here
+            re: /(javlibrary|javlib3|look4lib|5avlib|javli6|j8vlib|j9lib|jav11b|ja14b|13vlib|j17v|j18ib|19lib|j20a).*\?v=.*/,//all new site name should add here
             vid: function () {
                 return $('#video_id')[0].getElementsByClassName('text')[0].innerHTML;
             },
