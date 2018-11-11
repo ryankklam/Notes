@@ -56,3 +56,8 @@ a public field
 non-public field with getter or setter
 明天搞好个api sample然后upload hithub，sent个mail出去给小米
 ***
+
+##2018.11.11
+>荒废很久，突然想起，又重新记记吧
+今天主要是上gcp online课程
+***
