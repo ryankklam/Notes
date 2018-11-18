@@ -61,3 +61,6 @@ non-public field with getter or setter
 >荒废很久，突然想起，又重新记记吧
 今天主要是上gcp online课程
 ***
+
+##2018.11.17
+Atom Markdown Preview ： ctrl-shift-m.

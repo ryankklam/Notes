@@ -1,5 +1,8 @@
 # GCP HandsOn
 
+##Move instance to new zone
+>gcloud compute instances move
+
 ##Create a bucket using Cloud Shell
 >gsutil mb gs://<BUCKET_NAME>
 
