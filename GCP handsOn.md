@@ -1,7 +1,9 @@
 # GCP HandsOn
 
 ##Create a bucket using Cloud Shell
+```sh
 >gsutil mb gs://<BUCKET_NAME>
+```
 
 >Copy the file into one of the buckets you created earlier in the lab. Replace [MY_FILE] with the file you uploaded and [BUCKET_NAME] with one of your bucket names:
 >gsutil cp [MY_FILE] gs://[BUCKET_NAME]
@@ -13,12 +15,13 @@ Create an environment variable and replace [YOUR_REGION] with the region you sel
 >INFRACLASS_REGION=[YOUR_REGION]
 
 Create a subdirectory for materials used in this class:
-
+```sh
 mkdir infraclass
-
+```
 Create a file called config in the infraclass directory:
-
+```sh
 touch infraclass/config
+```
 
 Append the value of your Region environment variable to the config file:
 
@@ -47,3 +50,9 @@ Add the following line to the end of the file:
 
 source infraclass/config
 ***
+
+IP Addresses: https://cloud.google.com/compute/docs/ip-addresses/
+
+Subnets and CIDR ranges: https://cloud.google.com/compute/docs/alias-ip/#subnets_and_cidr_ranges
+
+Reflecting the new tighter policies, the new subnetwork is CIDR /26. How many VMs can that support?/26 = 64 addresses, minus broadcast, subnet, and gateway = 61 VMs.
