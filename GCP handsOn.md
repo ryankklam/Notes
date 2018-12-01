@@ -4,7 +4,9 @@
 >gcloud compute instances move
 
 ##Create a bucket using Cloud Shell
+```sh
 >gsutil mb gs://<BUCKET_NAME>
+```
 
 ##Create a globally unique bucket name and store it in the environment variable YOUR_BUCKET_NAME
 >export YOUR_BUCKET_NAME=<Enter your bucket name here>
@@ -19,12 +21,13 @@ Create an environment variable and replace [YOUR_REGION] with the region you sel
 >INFRACLASS_REGION=[YOUR_REGION]
 
 Create a subdirectory for materials used in this class:
-
+```sh
 mkdir infraclass
-
+```
 Create a file called config in the infraclass directory:
-
+```sh
 touch infraclass/config
+```
 
 Append the value of your Region environment variable to the config file:
 
