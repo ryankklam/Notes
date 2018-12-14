@@ -494,3 +494,26 @@ list the type of GCP resouces that you can control using deployment Manager
 ```sh
 gcloud deployment-manager types list
 ```
+
+
+## Cloud IAM Study
+1. Organization level: The organization resource represents your company.
+2. Services within the same project have a default level of trust.
+3. Child policies cannot restrict access granted at the parent.
+4. When using Cloud IAM, a best practice is to follow the principle of least privilege. The
+principle applies to identities, roles, and resources.
+5. Primitive roles: The original roles available in the Google Cloud Platform Console. These are the Owner, Editor, and Viewer roles. Still assigned by default to projects. Primitive roles are quite broad.
+6. Product-specific roles
+eg Compute Engine roles
+○ Compute Engine Instance Admin: VMs and disks
+○ Service Account User: service accounts
+○ Compute Engine Image User: images
+○ Compute Engine Network Viewer: read-only for all networking
+7. A service account is an identity for your programs to use to authenticate and gain
+access to Google Cloud Platform APIs
+For example, if you write an application that reads and writes files on Cloud Storage, you need to
+○ authenticate to the to either the Google Cloud Storage XML API or JSON
+API.
+○ program the application to obtain credentials from the service account.
+○ Your application authenticates seamlessly to the API without embedding any secret keys or credentials in your instance, image, or application code.
+8. Customizing scopes for a VM , Service accounts can use scopes through the Cloud SDK. gcloud and gsutil
