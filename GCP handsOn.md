@@ -517,3 +517,115 @@ API.
 ○ program the application to obtain credentials from the service account.
 ○ Your application authenticates seamlessly to the API without embedding any secret keys or credentials in your instance, image, or application code.
 8. Customizing scopes for a VM , Service accounts can use scopes through the Cloud SDK. gcloud and gsutil
+9. Cloud IAP (Identity-Aware Proxy) , setup a central authorization layer for application accessed by https. so you can use this application level access instead of network level firewals
+
+#### What abstraction is primarily used to administer user access in Cloud IAM ?
+1. Leases, an abstraction of periodic entitlements.
+2. Roles, an abstraction of job roles.
+3. Credentials, an abstraction of an authorization token.
+4. privileges, an abstraction of access rights
+
+#### How is a user identity created in Cloud IAM?
+1. User identities are created from the Cloud identity console that is only visible to GCP Super-administrators.
+2. User identities are created from the cloud IAM area of the GCP console, or by using the gcloud command.
+3. User identities are created through a frderated Active Directiory domain.
+4. User identities are created from outside of GCP in a Google-administered domain.
+
+What technology can be used along with Cloud IAM to provide another layer of security and access control in GCP?
+1. Machine learning;specifically,intrusion detection.
+2. Antivirus and anti-exploit Software built into GCP VMs.
+3. Networking; specifically firewall rules.
+4. Dynamic per-user resource throttling.
+
+
+Cloud Identity and Access Management (IAM) HandsOn Lab
+Overview
+Objectives
+Task 1: Setup for two users
+Task 2: Explore the IAM console
+Task 3: Prepare a resource for access testing
+Task 4: Remove project access
+Task 5: Add storage access
+Task 6: Set up the Service Account User
+Task 7: Explore the Service Account User role
+Task 8: Review
+End your lab
+
+1
+Service account details
+2
+Grant this service account access to project (optional)
+3
+Grant users access to this service account (optional)
+
+
+To rename the file you copied, run the following command:
+mv sample.txt sample2.txt
+
+To copy the renamed file back to the bucket, run the following command:
+gsutil cp sample2.txt gs://[YOUR_BUCKET_NAME]
+
+What happened?
+
+Because you connected via SSH to the instance, you can "act as the service account," essentially assuming the same permissions.The service account the instance was started with had the Storage Viewer role, which permits downloading objects from GCS buckets in the project.To list instances in a project, you need to grant the compute.instance.list permission. Because the service account did not have this permission, you could not list instances running in the project. Because the service account did have permission to download objects, it could download an object from the bucket. It did not have permission to write objects, so you got a "403 access denied" message.
+
+## Data Storage services
+Storage & Database decision
+1. Cloud storage: like file system , store blobs in buckets
+   regional/muti-regional/nearline/coldline
+   Strong global consistency - immediately available after insert/update
+2. Cloud SQL: hosted Relational database , No-ops
+3. Cloud Spanner: Relational database,Globally/horizontal scalable
+4. Cloud datastore: Persistend Hashmap,structured database
+5. Cloud BigTable: Key-values , HBase, put row
+
+#### Create a bucket using Cloud Shell
+```sh
+>gsutil mb gs://<BUCKET_NAME>
+```
+
+#### Rename - gsutil mv
+```sh
+gsutil mv gs://[BUCKET_NAME]/[OLD_OBJECT_NAME] gs://[BUCKET_NAME]/[NEW_OBJECT_NAME]
+```
+
+#### Copy - gsutil cp
+```sh
+gsutil mv gs://[BUCKET_NAME]/[OLD_OBJECT_NAME] gs://[BUCKET_NAME]/[NEW_OBJECT_NAME]
+```
+
+#### Move - gsutil mv
+```sh
+gsutil mv gs://[SOURCE_BUCKET_NAME]/[SOURCE_OBJECT_NAME] gs://[DESTINATION_BUCKET_NAME]/[DESTINATION_OBJECT_NAME]
+```
+
+#### Check/Modify ACL - gsutil acl get/set
+```sh
+gsutil acl get gs://bucket/file.txt > acl.txt
+gsutil acl set acl.txt gs://bucket/*.jpg
+```
+
+#### Detail ACL grant to user(-u)/group(-g)/Project(-p) with read/write/Owner authority
+```sh
+gsutil acl ch -u john.doe@example.com:W gs://ryan4299899bbb
+```
+
+#### lifecycle - Get or set lifecycle configuration for a bucket
+```sh
+gsutil lifecycle get gs://ryan4299899bbb
+gsutil lifecycle set [config-json-file] url...
+```
+
+#### versioning
+```sh
+gsutil versioning get gs:/ryan4299899
+gsutil versioning set [on|off] gs://ryan4299899bbb
+```
+
+#### rsync - Synchronize content of two buckets/directories
+```sh
+gsutil rsync [OPTION]... src_url dst_url
+gsutil rsync -d data gs://mybucket/data  - to make gs://mybucket/data match the contents of the local directory "data"
+gsutil rsync -r data gs://mybucket/data  -  To copy only new/changed files without deleting extra files from gs://mybucket/data leave off the -d option:
+gsutil -m rsync -d -r data gs://mybucket/data  -m option, to perform parallel (multi-threaded/multi-processing) synchronization:
+```
