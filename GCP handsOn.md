@@ -576,8 +576,14 @@ Storage & Database decision
    Strong global consistency - immediately available after insert/update
 2. Cloud SQL: hosted Relational database , No-ops
 3. Cloud Spanner: Relational database,Globally/horizontal scalable
-4. Cloud datastore: Persistend Hashmap,structured database
-5. Cloud BigTable: Key-values , HBase, put row
+4. Cloud datastore: Persistend Hashmap,structured database , key-entry storage system (not key-value)
+    schemaless , being able to store any entity.
+    sql-like capabilities
+    used with app engine, also with memcache.
+    kind=table/entity=row/property=field/key=primary key
+    free daily quota
+    supports ACID transactions
+5. Cloud BigTable: Key-values , HBase, put row , NoSQL
 
 #### Create a bucket using Cloud Shell
 ```sh
@@ -629,3 +635,13 @@ gsutil rsync -d data gs://mybucket/data  - to make gs://mybucket/data match the 
 gsutil rsync -r data gs://mybucket/data  -  To copy only new/changed files without deleting extra files from gs://mybucket/data leave off the -d option:
 gsutil -m rsync -d -r data gs://mybucket/data  -m option, to perform parallel (multi-threaded/multi-processing) synchronization:
 ```
+
+#### You are developing an application that transcodes large video files. Which storage option is the best choice for your application?
+Because video files are blobs and cloud storage is cheap, I would use Google Cloud Storage for this application.
+
+#### You manufacture devices with sensors and need to stream huge amounts of data from those devices to a storage option in the cloud. Which Google Cloud Platform storage option is the best choice for your application?
+The key to this question is, streaming huge amounts of data. When you are accumulating lots of data quickly, Bigtable is ideal.
+
+#### Compare labels and tags ?
+Labels are a way to organize resources across GCP , user-defined strings in key-value information
+Tags are apply to instance only , primarily used for networking
