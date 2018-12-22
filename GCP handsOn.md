@@ -122,7 +122,8 @@ IP Addresses: https://cloud.google.com/compute/docs/ip-addresses/
 
 Subnets and CIDR ranges: https://cloud.google.com/compute/docs/alias-ip/#subnets_and_cidr_ranges
 
-Reflecting the new tighter policies, the new subnetwork is CIDR /26. How many VMs can that support?/26 = 64 addresses, minus broadcast, subnet, and gateway = 61 VMs.
+Reflecting the new tighter policies, the new subnetwork is CIDR /26. How many VMs can that support?/26 = 64 addresses (2 * 30-26 次方
+  ), minus broadcast, subnet, and gateway = 61 VMs.
 
 
 Big query select , [DatasetID.TableID.Field]
@@ -645,3 +646,234 @@ The key to this question is, streaming huge amounts of data. When you are accumu
 #### Compare labels and tags ?
 Labels are a way to organize resources across GCP , user-defined strings in key-value information
 Tags are apply to instance only , primarily used for networking
+
+## Virtual-Networks
+
+CIDR主要是一个按位的、基于前缀的，用于解释IP地址的标准。它通过把多个地址块组合到一个路由表表项而使得路由更加方便。这些地址块叫做CIDR地址块。当用二进制表示这些地址时，它们有着在开头部分的一系列相同的位。IPv4的CIDR地址块的表示方法和IPv4地址的表示方法是相似的：由四部分组成的点分十进制地址，后跟一个斜线，最后是范围在0到32之间的一个数字：A.B.C.D/N。点分十进制的部分和IPv4地址一样是一个被分成四个八位位组的32位二进制数。斜线后面的数字就是前缀长度，也就是从左到右，被地址块里的地址所共享的位的数目。当只需说明大概时，十进制部分有时会被省略，因此，/20就表示一个前缀长度是20的CIDR地址块。如果一个IP地址的前N位与一个CIDR地址块的前缀是相同的话，那么就说这个地址属于这个CIDR地址块，也可以说是与CIDR地址块的前缀匹配。所以，要理解CIDR，就要把地址写成二进制的形式。因为IPv4地址的长度总是32位，N位长的CIDR前缀就意味着地址里 {\displaystyle 32-N} 32-N位不匹配。这些位有 {\displaystyle 2^{(32-N)}} 2^{{(32-N)}}种不同的组合，即 {\displaystyle 2^{(32-N)}} 2^{{(32-N)}}个IPv4地址与CIDR地址块的前缀匹配。前缀越短就能匹配越多的地址，越长就匹配得越少。一个地址可能与多个长度不同的CIDR前缀匹配。
+
+#### DNS resolution
+1. Internal: 实例的内部完全限定域名 (FQDN) 采用以下格式 [HOST_NAME].c.[PROJECT_ID].internal
+2. External: User can directly connect using external ip , or publish public DNS (outside of GCP) , DNS zones can be host using Cloud DNS
+3. Cloud DNS: Publish your domain names using Google's infrastructure for production-quality, high-volume DNS services. Google's global network of anycast name servers provide reliable, low-latency authoritative name lookups for your domains from anywhere in the world.
+
+### VPC 特性
+1. 全球性. 单个 Google Cloud VPC 可以横跨多个区域，而无需在公共互联网上进行通信。通过 VPC 与本地资源之间的单个连接点即可在全球访问 VPC，降低了成本和复杂性
+![VPC全球性](https://cloud.google.com/images/products/virtual-network/global.svg "VPC全球性")
+
+3. 可扩展. Google Cloud VPC 让您无需关闭任何工作负载或停机就能增加任意子网的 IP 空间。这为您提供了灵活性和增长选项，从而满足您的需求。
+![VPC可扩展](https://cloud.google.com/images/products/virtual-network/expandable.gif "VPC可扩展")
+
+#### Alias IP ranges
+1. 所有子网都具有“主要 CIDR 范围”，也就是用于定义子网的内部 IP 地址范围。每个虚拟机实例均从该范围内获取其主要内部 IP 地址。您还可以从该主要范围分配别名 IP 范围，或者向子网添加次要范围，并从次要范围分配别名 IP 范围。使用别名 IP 范围时，次要子网范围并非必需。这些次要子网范围仅用于提供一种组织工具。
+2. 配置了别名 IP 范围时，GCP 将自动安装 VPC 网络路由，以便为主要网络接口的子网获得主要和别名 IP 范围。这可以简化路由流量并管理您的容器。
+3. 别名 IP 地址可以通过 Cloud Router 发布到通过 VPN 或互连连接的本地部署网络。
+4. 从次要 CIDR 范围分配别名 IP 范围具有一定的优势。由于分配时所使用的范围与主要 IP 地址所使用的范围彼此分离，因此您可以将基础架构（虚拟机）与服务（容器）分离开来。在为基础架构和服务配置不同的地址空间时，可以独立于虚拟机主要 IP 地址的防火墙控制，为虚拟机别名 IP 地址另行设置防火墙控制。例如，您可以允许针对某些容器 pod 的流量，并拒绝针对虚拟机主要 IP 地址的类似流量。
+
+##### 示例：配置使用别名 IP 范围的容器
+![alias-ip](https://cloud.google.com/vpc/images/alias-ip/alias-ip-2.svg "alias-ip")
+
+要创建上图所示配置，请执行以下操作：
+
+1. 创建一个子网，使用 CIDR 范围 10.128.0.0/16（从此范围内分配虚拟机 IP 地址），并使用仅供容器使用的次要 CIDR 范围 172.16.0.0/20，此次要范围会配置为托管它们的虚拟机内的别名 IP 范围：
+```sh
+gcloud compute networks subnets create subnet-a \
+    --network network-a \
+    --range 10.128.0.0/16 \
+    --secondary-range container-range=172.16.0.0/20
+```
+2. 创建虚拟机，使用范围 10.128.0.0/16 内的主要 IP 地址和次要 CIDR 范围 172.16.0.0/20 内的别名 IP 范围 172.16.0.0/24，供虚拟机内的容器使用：
+```sh
+gcloud compute instances create vm1 [...] \
+    --network-interface subnet=subnet-a,aliases=container-range:172.16.0.0/24
+gcloud compute instances create vm2 [...] \
+    --network-interface subnet=subnet-a,aliases=container-range:172.16.1.0/24
+```
+
+容器 IP 地址在 GCP 中配置为别名 IP 地址。在此设置中，主要和别名 IP 均可通过 VPN 隧道访问。如果配置了 Cloud Router，则它会自动通告次要子网范围 172.16.0.0/20。要详细了解如何将 VPN 与 Cloud Router 搭配使用，请参阅使用动态路由创建 VPN 隧道。
+
+##### 示例：在单个虚拟机实例中配置多个别名 IP 范围
+```sh
+1. create network
+gcloud compute networks create vpc1 --subnet-mode custom
+
+2. create subnet
+gcloud compute networks subnets create subnet1 --region us-central1 --network vpc1 --range 10.128.0.0/16 --secondary-range secondaryrange1=172.16.0.0/20
+
+3. create vm bind to the subnet1
+gcloud compute instances create vm1 --zone us-central1-a --network-interface "subnet=subnet1,aliases=secondaryrange1:172.16.0.0/27;secondaryrange1:172.16.1.0/32"
+```
+
+subnet参数若有被双引号围起来，则为在主要 CIDR 范围内创建具有别名 IP 范围的虚拟机； 若无双引号则为在次要 CIDR 范围内创建具有别名 IP 范围的虚拟机
+
+##### delete network
+1. all Vm & firewall rules must be deleted First
+2. subnetwork can not be deleted on auto-mode network(can delete under custom netwotrks)
+3. On auto-mode network , only the entire network can be deleted
+
+
+#####  Explore connectivity
+
+| Subnet  | location | Range |
+| ------ | ------ | ------ |
+| subnet-1a | us-east1 | 192.168.5.0/24 |
+| subnet-1b | us-east1 | 192.168.3.0/24 |
+| subnet-2 | us-west1 | 192.168.7.0/24 |
+
+| VM  | Network | Subnet  | Region | Zone |
+| ------ | ------ | ------ |
+| learn-1 | default | n/a | us-east1 | us-east1-b |
+| learn-2 | learnauto | n/a | us-east1 | us-east1-b |
+| learn-3 | learncustom | subnet-1a | us-east1 | us-east1-b |
+| learn-4 | learncustom | subnet-1a | us-east1 | us-east1-c |
+| learn-5 | learncustom | subnet-2 | us-west1 | us-west1-a |
+
+1. firewall rules will not auto create for custom networks , it'll create for default/auto networks.
+2. routes will create for all 3 network types
+
+Step 1 ping from learn-1
+Console: Products and Services > Compute Engine > VM instances , Click on the link to SSH to learn-1.
+
+```sh
+$ ping learn-1 , This should succeed.
+$ ping learn-2 , Name or service not known , It is because DNS is scoped to network. The VM learn-2 is not in the default network where learn-1 is located.
+$ ping <learn-2 external IP> , This should succeed. learn-2 is in an auto-type network, so firewall rules were automatically created that enabled ingress traffic to reach its external IP.
+$ ping <learn-3 external IP> , this should failed , learn-3 is in a custom-type network, and no firewall rules were established. You need to creat a firewall rule to permit access.
+```
+
+Step 2 ping from learn-3
+```sh
+$ ping learn-4 , ping learn-5 , DNS translation is working , however no package is deliverd to target VM
+PING learn5.c.qwiklabs-gcp-1c1e9db7bdb37581.internal (192.168.7.2) 56(84) bytes of data.
+DNS translation is working both learn-4 and learn-5 because all of these VMs are in the same network as learn-4, the learncustom network.
+But package not sent to target as we have firewall rules to allow tag only.
+```
+
+Increase the address range
+```sh
+$ gcloud compute networks subnets \
+expand-ip-range new-useast  \
+--prefix-length 24 \
+--region us-east1
+```
+
+#####  Common Network designs
+1. Routes & firewalls are global resource.
+2. Subnets can't span regions.
+3. Availablity , 1 project/1 network/1 region/1 subnetwork/deploy vm to multiple zones
+4. Globalization , 1 project/1 network/multiple region/2 subnetworks/deploy vm to multiple zones , because VMs are in the single network , they can talk trough GCP's internal global network even they're different zones
+5. Cross-project VPC network peering  , multiple project/multiple network/multiple region/multiple zones/multiple subnetworks, Using Sharing mechannism enables collaboration between parts , while isolation prevents error spread to other parts
+6. Management seperation , multiple project/multiple network/1 region/1 zones/multiple subnetworks, seperate projects means fine-grained control. But network can not cross projects , so they need to talk to each other via internet istead of GCP internal network.
+7. Bastion hosts ,
+8. NAT gateway host isolation (将实例配置为 NAT 网关)
+
+#### Lab: Bastion Host
+1. Create webserver VM which you wanna protect , have a "webserver" service
+2. Restrict firewall rule settings for HTTP : select the default-allow-http rule , in Source filter, change this to IP ranges , and range mark to your IP address
+3. Restrict access to the VM from the Internet - Remove the External IP - change it from Ephemeral to none.
+4. Create bastion VM , you can directly ping & curl "webserver" since they're in the same network , they can communicate over internal ip
+You restricted access to the webserver VM by removing it's external IP address
+You created a bastion host named bastion to gain access to the webserver VM over it's internal IP.
+Normally, you would harden the bastion host by restricting the source IPs that can access the bastion host, by editing the firewall rules just as you did earlier in this lab.
+
+What address is reserved for the router address? - 10.0.0.1
+What address is reserved for the broadcast address? - 10.0.0.255
+How many IP addresses are assigned by default to a VM after creation? - 2, an internal IP and an external IP
+
+## Virtual Michines
+1. Inferred instances discount : Usage of the same Michine type in the same zone is combined like they're 1 Michine, to give u best discount.
+2. Linux-SSH,need firewall allow tcp:22, Windows:RDP,need firewall allow tcp:3389
+3. Instance reset: keep ip address,disk,etc , but all data will will clean.
+   instance restart: keep most of the things
+   instance delete then create : it may have diff ip address , physical hardware , etc
+```sh
+gcloud compute instances reset example-instance
+gcloud compute instances start example-instance
+gcloud compute instances describe <instance> - check instance status
+```
+
+#### Lab: Creating a Virtual Machine
+```sh
+gcloud compute instances create gcelab2 --zone us-central1-c
+gcloud config set compute/zone - set default zone
+```
+
+#### Lab: Work with virtual machines
+##### Create the VM Instance
+1. Add API access for Cloud Storage
+2. Create an additional data disk , will store in cloud storage
+3. Add a Tag for a firewall rule
+4. Create an External static IP
+
+##### Prepare the data disk
+1. Create a directory
+```sh
+sudo mkdir -p /home/minecraft
+```
+2. Format the disk
+```sh
+sudo mkfs.ext4 -F -E lazy_itable_init=0,\
+lazy_journal_init=0,discard \
+/dev/disk/by-id/google-minecraft-disk
+```
+3. Mount the disk
+```sh
+sudo mount -o discard,defaults /dev/disk/by-id/google-minecraft-disk /home/minecraft
+```
+
+##### Install and run the application
+##### Allow client traffic - setup firewall rules to allow specific tag on tcp:25565
+##### Schedule regular backups
+```sh
+gsutil mb gs://ryan4299899CCCbackup - create bucket
+sudo nano /home/minecraft/backup.sh - Create a backup script
+sudo chmod 755 /home/minecraft/backup.sh - Make the script executable
+sudo crontab -e -- Open the cron table for editing:
+0 */4 * * * /home/minecraft/backup.sh - this will create about 300 backups a month in Cloud Storage
+Edit VM properties , Custom metadata , to add start-up/shutdown script
+
+Start-up
+#!/bin/bash
+mount /dev/disk/by-id/google-minecraft-disk /home/minecraft
+(crontab -l ; echo "0 */4 * * * /home/minecraft/backup.sh")| crontab -
+cd /home/minecraft
+screen -d -m -S mcs java -Xms1G -Xmx7G -d64 -jar minecraft_server.1.11.2.jar nogui
+
+shut-down
+#!/bin/bash
+sudo screen -r -X stuff '/stop\n'
+```
+
+These scripts will run automatically when you start or stop your instance.
+When you restart your instance, the startup-script will automatically mount the Minecraft disk to the appropriate directory, reinstall your cron job, start your Minecraft server in a screen session, and detach the session.
+When you stop the instance, the shutdown-script will shut down your Minecraft server before the instance shuts down.
+
+## Container and Services 01 - Application infrastructure service
+### Cloud Pub/Sub
+#### The Basic
+1. Publisher publish a message to Topic
+2. Topic store messages for Availablity & reliability
+3. Topic sent message to Subscription(订阅)
+4. Subscription determine which Subscriber to receive message & sent
+5. After message consumed , Subscriber sent back acknowledgement back to Subscription
+6. Subscription removed the mesage when all deliveries are complete.
+> 在此方案中，有两个发布者在单个主题上发布消息。该主题有两个订阅，第一个订阅有两个订阅者，第二个订阅有一个订阅者。粗体字母代表消息。消息 A 来自发布者 1，通过订阅 1 发送给订阅者 2，通过订阅 2 发送给订阅者 3。消息 B 来自发布者 2，通过订阅 1 发送给订阅者 1，通过订阅 2 发送给订阅者 3。
+
+![Pub/Sub basic](https://cloud.google.com/pubsub/images/wp_flow.svg "Pub/Sub basic")
+
+### Cloud Endpoints - API management
+### Cloud Function - = AWS LAMDA
+### Cloud Source Repositories
+### Cloud Machine learning
+
+## Container and Services 02 - Application development service
+### App engine (GAE) is a PaaS
+#### Comparing env (Standard vs Flexible)
+
+| Feature  | Standard | Flexible |
+| ------ | ------ | ------ |
+| Instance start up | in mill sec | in minutes|
+| SSH Debug | No | Yes |
+| Install 3rd binaries | No | Yes |
+| Language Support | limited | Any |
+
+## Container and Services 03 - Containers

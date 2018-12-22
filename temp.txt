@@ -1,0 +1,26 @@
+YOUR_LB_IP
+35.244.160.191:80
+
+us-central1
+
+
+google1706760_student@qwiklabs.net
+FpGMLsFVp8n
+
+https://console.cloud.google.com/home/dashboard?project=qwiklabs-gcp-67912e457d54a892&pli=1
+
+
+2de89b5c0fdd02cc
+google1804223_student@qwiklabs.net
+3C8BvH6st
+
+subnet1 - 10.1.0.0/16
+00001010000000010000000000000000
+10.2.0.0/16
+00001010000000100000000000000000
+
+VM primary 10.1.0.2 , allocate from subnet1
+00001010000000010000000000000010
+
+Alias IP range - 10.2.1.0/24
+00001010000000100000000100000000
