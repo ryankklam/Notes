@@ -131,63 +131,7 @@ Big query select , [DatasetID.TableID.Field]
 To verify that gcloud is configured to [PROJECT_ID], run the following command:
 gcloud config list project
 
-In Cloud Shell, to create the vpn-1 gateway, run the following command:
-gcloud compute target-vpn-gateways \
-create vpn-1 \
---network vpn-network-1  \
---region us-east1
 
-To reserve a Static IP for the vpn-1 gateway, run the following command:
-gcloud compute addresses create --region us-east1 vpn-1-static-ip
-
-To view the Static IP for the vpn-1 gateway, run the following command:
-gcloud compute addresses list
-
-To store the Static IP for the vpn-1 gateway, in an environment variable, run the following command, and replace the IP address with the address from the output of the last command:
-export STATIC_IP_VPN_1=<Enter IP address for vpn-1 here>
-
-To create ESP forwarding for vpn-1, run the following command:
-gcloud compute \
-forwarding-rules create vpn-1-esp \
---region us-east1  \
---ip-protocol ESP  \
---address $STATIC_IP_VPN_1 \
---target-vpn-gateway vpn-1
-
-To create UDP500 forwarding for vpn-1, run the following command:
-gcloud compute \
-forwarding-rules create vpn-1-udp500  \
---region us-east1 \
---ip-protocol UDP \
---ports 500 \
---address $STATIC_IP_VPN_1 \
---target-vpn-gateway vpn-1
-
-In the GCP Console, on the Navigation menu ( 7a91d354499ac9f1.png), click VPC network > External IP addresses.
-Verify that both regions have an external IP address reserved and that all three forwarding rules are displayed in the__ In use by__ column.
-Alternatively, you can reserve static addresses and set forwarding rules through this section of the GCP Console.
-
-In Cloud Shell, to verify the VPN gateways, run the following command:
-gcloud compute target-vpn-gateways list
-
-To create the tunnel for traffic from Network-1 to Network-2, run the following command:
-gcloud compute \
-vpn-tunnels create tunnel1to2  \
---peer-address $STATIC_IP_VPN_2 \
---region us-east1 \
---ike-version 2 \
---shared-secret gcprocks \
---target-vpn-gateway vpn-1 \
---local-traffic-selector 0.0.0.0/0 \
---remote-traffic-selector 0.0.0.0/0
-
-To create a static route from Network-1 to Network-2, run the following command:
-gcloud compute  \
-routes create route1to2  \
---network vpn-network-1 \
---next-hop-vpn-tunnel tunnel1to2 \
---next-hop-vpn-tunnel-region us-east1 \
---destination-range 10.1.3.0/24
 
 
 ## Virtual Machine Automation and Load Balancing v1.5
@@ -877,3 +821,264 @@ When you stop the instance, the shutdown-script will shut down your Minecraft se
 | Language Support | limited | Any |
 
 ## Container and Services 03 - Containers
+### Kubernetes Engine
+1. Pod是Kubernetes创建或部署的最小/最简单的基本单位，一个Pod代表集群上正在运行的一个进程。一个Pod封装一个应用容器（也可以有多个容器），Pod代表部署的一个单位：Kubernetes中单个应用的实例，它可能由单个容器或多个容器共享组成的资源。同一pod中的容器共享资源 ， share single IP address & namespace ， 它们之间能够共享资源
+2. Kubernetes Labels 和 Selectors ： Labels其实就一对 key/value ，被关联到对象上，标签的使用我们倾向于能够标示对象的特殊特点。 通过标签选择器（Labels Selectors），客户端/用户 能方便辨识出一组对象。标签选择器是kubernetes中核心的组成部分。
+3. Node是Kubernetes中的工作节点，最开始被称为minion。一个Node可以是VM或物理机。每个Node（节点）具有运行pod的一些必要服务，并由Master组件进行管理，Node节点上的服务包括Docker、kubelet和kube-proxy。
+4. Kubelet 是在每个节点上运行的主要 “节点代理”。kubelet 以 PodSpec 为单位来运行任务，PodSpec 是一个描述 pod 的 YAML 或 JSON 对象。 kubelet 运行多种机制（主要通过 apiserver）提供的一组 PodSpec，并确保这些 PodSpecs 中描述的容器健康运行。 不是 Kubernetes 创建的容器将不在 kubelet 的管理范围。
+5. Container Cluster是一组运行kubernetes节点（node）的group
+6. Kubernetes Deployment为Pod和Replica Set（升级版的 Replication Controller）提供声明式更新。你只需要在 Deployment 中描述您想要的目标状态是什么，Deployment controller 就会帮您将 Pod 和ReplicaSet 的实际状态改变到您的目标状态。您可以定义一个全新的 Deployment 来创建 ReplicaSet 或者删除已有的 Deployment 并创建一个新的来替换。
+7. Kubernetes Service 定义了这样一种抽象：一个 Pod 的逻辑分组，一种可以访问它们的策略 —— 通常称为微服务。 这一组 Pod 能够被 Service 访问到，通常是通过 Label Selector,举个例子，考虑一个图片处理 backend，它运行了3个副本。这些副本是可互换的 —— frontend 不需要关心它们调用了哪个 backend 副本。 然而组成这一组 backend 程序的 Pod 实际上可能会发生变化，frontend 客户端不应该也没必要知道，而且也不需要跟踪这一组 backend 的状态。 Service 定义的抽象能够解耦这种关联。
+```yml
+kind: Service
+apiVersion: v1
+metadata:
+  name: my-service
+spec:
+  selector:
+    app: MyApp
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 9376
+```
+8. Node pools - instances group. all Vms in a pool are the same.
+
+### Container Registry
+1. 存储、管理和保护您的 Docker 容器映像。可public or private
+2. 自动构建和部署. 在您将代码提交到 Cloud Source Repositories、GitHub 或 Bitbucket 时，自动构建映像并将其推送到私有注册表中。通过与 Cloud Build 集成轻松设置 CI/CD 流水线，或者直接部署到 Kubernetes Engine、App Engine、Cloud Functions 或 Firebase。
+3. 集成IAM roles & ACLs
+
+#### Kubernetes,GKE and Load Balancing HandsOn Lab
+1. Set gcloud default values.
+```sh
+gcloud config set project qwiklabs-gcp-437387901e6e17bb
+gcloud config set compute/zone us-central1-c
+gcloud config set compute/region us-central1
+gcloud config list
+```
+2. Set env variable
+```sh
+export CLUSTER_NAME="httploadbalancer"
+export ZONE="us-central1-c"
+export REGION="us-central1"
+```
+3.  Create a Kubernetes cluster for network load balancing
+```sh
+gcloud container clusters create networklb --num-nodes 3
+```
+4. Deploy nginx in Kubernetes
+```sh
+kubectl run nginx --image=nginx --replicas=3  - This will create a replication controller to spin up 3 pods, each pod runs the nginx container.
+kubectl get pods -owide - Verify that the pods are running.
+kubectl expose deployment nginx --port=80 --target-port=80 \
+--type=LoadBalancer
+将资源暴露为新的Kubernetes Service , This  will create a network load balancer to load balance traffic to the three nginx instances.
+kubectl get service nginx -  Find the network load balancer address
+```
+
+You can then visit http://EXTERNAL_IP/ to see the server being served through network load balancing.
+
+5. Undeploy nginx
+```sh
+kubectl delete service nginx - Delete the service
+kubectl delete deployment nginx - Delete the replication controller. This will subsequently delete the pods (all of the nginx instances) as well
+gcloud container clusters delete networklb - Delete the cluster.
+```
+
+6. Create the Kubernetes cluster for HTTP load balancing
+```sh
+gcloud container clusters create $CLUSTER_NAME --zone $ZONE
+```
+
+7. Create and expose the service
+```sh
+kubectl run nginx --image=nginx --port=80 - creates an instance of the nginx image serving on port 80.
+kubectl expose deployment nginx --target-port=80 --type=NodePort - Create a Container Engine service that exposes the nginx Pod on each Node in the cluster.
+```
+
+8. Create an Ingress object
+```sh
+kubectl create -f basic-ingress.yaml -  Ingress will create the HTTP load balancing resources in GCE and connect them to the deployment , base on the yaml
+kubectl get ingress basic-ingress --watch - monitor the progress.
+kubectl describe ingress basic-ingress -  It will give you a list of the HTTP load balancing resources, the backend systems, and their health status
+curl [IP Address] - Use curl or browse to the address to verify that nginx is being served through the load balancer.
+```
+
+basic-ingress.yaml
+```yaml
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: basic-ingress
+spec:
+  backend:
+    serviceName: nginx
+    servicePort: 80
+```
+
+## Elastic Cloud 01 - Interconnecting Nekworks
+
+| Feature  | Desc | Product |
+| ------ | ------ | ------ |
+| Global Scale | Application delivery at scale globally or regionally | Load balancing (HTTP,tcp,udp), Cloud CDN,Cloud DNS|
+| Virtual Network| Global private space,regional segmentation | SDN network virtualization,Global networks , granular subnetworks |
+| Hybrid Cloud | Connect to on-premises | Cloud VPN,Cloud Router,Cloud Interconnect |
+| Control | user control,security policies,visibility/diagnostics | Network IAM roles,Firewalls |
+
+### Cloud VPN
+### Virtual private Network(VPN) v1.5 Lab
+1. Setup networks
+
+| Name  | subnet | Region/Zone | IP Range |
+| ------ | ------ | ------ |
+| vpn-network-1 | subnet-a | us-east1| 10.5.4.0/24 |
+| vpn-network-2 | subnet-b | europe-west1| 10.1.3.0/24 |
+
+2. Setup VM
+
+| Name  | Region/Zone | Network | Subnet |
+| ------ | ------ | ------ |
+| server-1 | us-east1-b| vpn-network-1 | subnet-a |
+| server-2 | europe-west1-b| vpn-network-2 | subnet-b |
+
+3. Setup firewall rules
+
+| Name  | Network | Targets | Source filter | IP Range | Protocols and ports |
+| ------ | ------ | ------ |
+| allow-icmp-ssh-network-1 | vpn-network-1 | All instances | ip range | 0.0.0.0/0 | tcp:22,icmp |
+| allow-icmp-ssh-network-2 | vpn-network-2 | All instances | ip range | 0.0.0.0/0 | tcp:22,icmp |
+
+4. Ping both from server1 to 2 & 2 to 1
+Internal Ip , failed
+External Ip . Ok (because through internet ???)
+> why we test this ??? because the path from subneta to subnetb is not the same path as b to a.if both tunnel not established,the ping maight reach the remote but responses can't be return.
+
+4. Create & Prepare VPN gateways to establish VPN tunnels
+
+| Name  | Region/Zone | Network |
+| ------ | ------ | ------ |
+| vpn-1 | us-east1| vpn-network-1 |
+| vpn-2 | europe-west1| vpn-network-2 |
+```sh
+gcloud compute target-vpn-gateways \
+create vpn-1 \
+--network vpn-network-1  \
+--region us-east1
+
+gcloud compute target-vpn-gateways \
+create vpn-2 \
+--network vpn-network-2  \
+--region europe-west1
+```
+
+To reserve a Static IP for the vpn-1 gateway, run the following command:
+```sh
+gcloud compute addresses create --region us-east1 vpn-1-static-ip
+gcloud compute addresses create --region europe-west1 vpn-2-static-ip
+gcloud compute addresses list - To view the Static IP for the vpn-1 gateway
+
+NAME             ADDRESS/RANGE   TYPE  PURPOSE  NETWORK  REGION        SUBNET  STATUS
+vpn-2-static-ip  35.187.171.236                          europe-west1          RESERVED
+vpn-1-static-ip  35.237.168.121                          us-east1              RESERVED
+```
+
+create ESP forwarding for vpn-1 with store the Static IP for the vpn-1 gateway
+```sh
+export STATIC_IP_VPN_1=<Enter IP address for vpn-1 here>
+
+gcloud compute \
+forwarding-rules create vpn-1-esp \
+--region us-east1  \
+--ip-protocol ESP  \
+--address $STATIC_IP_VPN_1 \
+--target-vpn-gateway vpn-1
+```
+
+To create UDP500 forwarding for vpn-1, run the following command:
+```sh
+gcloud compute \
+forwarding-rules create vpn-1-udp500  \
+--region us-east1 \
+--ip-protocol UDP \
+--ports 500 \
+--address $STATIC_IP_VPN_1 \
+--target-vpn-gateway vpn-1
+```
+
+Create tunnels
+```sh
+gcloud compute \
+vpn-tunnels create tunnel1to2  \
+--peer-address $STATIC_IP_VPN_2 \
+--region us-east1 \
+--ike-version 2 \
+--shared-secret gcprocks \
+--target-vpn-gateway vpn-1 \
+--local-traffic-selector 0.0.0.0/0 \
+--remote-traffic-selector 0.0.0.0/0
+```
+
+To verify tunnels created
+```sh
+gcloud compute vpn-tunnels list
+
+NAME        REGION        GATEWAY  PEER_ADDRESS
+tunnel2to1  europe-west1  vpn-2    35.237.168.121
+tunnel1to2  us-east1      vpn-1    35.187.171.236
+```
+
+Ok at this point the gateways are comnected and communicating. But there's no method to direct traffic from one subnet to another , you must establish static routes
+
+create a static route from Network-1 to Network-2, run the following command:
+```sh
+gcloud compute  \
+routes create route1to2  \
+--network vpn-network-1 \
+--next-hop-vpn-tunnel tunnel1to2 \
+--next-hop-vpn-tunnel-region us-east1 \
+--destination-range 10.1.3.0/24
+```
+
+Ping both from server1 to 2 & 2 to 1
+Internal Ip , ok (we have build the VPN tunnel so that it can communicate via internet)
+External Ip . Ok
+
+### Cloud VPN
+Cloud Router Overview
+Cloud Router is a fully distributed and managed Google cloud service. It scales with your network traffic; it's not a physical device that might cause a bottleneck.
+
+When you extend your on-premises network to Google Cloud, use Cloud Router to dynamically exchange routes between your Google Cloud networks and your on-premises network. Cloud Router peers with your on-premises VPN gateway or router. The routers exchange topology information through Border Gateway Protocol (BGP). Topology changes automatically propagate between your VPC network and on-premises network. You don't need to configure static routes.
+
+### Cloud Interconnect - 以多种方式将您的基础架构连接到 Google Cloud Platform (GCP)
+数据流量不走互联网！！！
+
+##### 专用互连(Direct peering)
+如果您希望将您的数据中心网络扩展到您的 Google Cloud 项目，专用互连可提供与 GCP 之间的企业级连接。使用此解决方案，您可以直接将您的本地网络连接到您的 GCP VPC。您必须在我们的某个支持的位置与 Google 建立连接。
+适用于连接到 VPC 和混合环境，将您的企业数据中心 IP 空间扩展到 Google Cloud；另外也适用于高带宽流量（大于 2Gbps），例如传输大型数据集时。
+专用互连可以配置为提供 99.9% 或 99.99% 的正常运行时间 SLA。如需详细了解如何实现这些 SLA，请参阅专用互连文档。
+
+##### 合作伙伴互连(Carrier peering)
+您还可以通过自己了解且惯用的服务提供商将您的数据中心网络扩展到您的 Google Cloud 项目，合作伙伴互连可提供类似于专用互连的企业级连接。使用此解决方案，您可以通过 Google Cloud 众多的服务提供商合作伙伴之一添加从本地网络到 GCP VPC 的连接。
+合作伙伴互连为您提供 50Mbps 至 10Gbps 的带宽选项，让您可以通过最适合自己需求的带宽连接到 VPC 并将公司数据中心的 IP 空间扩展到 Google Cloud。这样，当您无法在我们的某个专用互连位置与我们建立连接时，可以通过我们的合作伙伴获得与专用互连类似的 SLA 选项。
+如需详细了解如何在您的 GCP 项目中创建合作伙伴互连，请参阅合作伙伴互连文档。
+![interconnect](https://cloud.google.com/interconnect/images/interconnect-baybridge-flowchart.svg "interconnect")
+
+
+VPC 网络对等互连
+Google Cloud Platform (GCP) 虚拟私有云 (VPC) 网络对等互连允许跨两个 VPC 网络的专用 RFC 1918 连接（而不管它们是不是属于同一个项目或组织）。
+
+## Elastic Cloud 02 Load balancing
+
+##### Manage instance group
+1. Can config health check in template
+
+##### https load Balancing
+1. HTTP request balancing on port 80/8080
+2. HTTPs request balancing on port 443
+![http(s) load Balancing](https://cloud.google.com/load-balancing/images/basic-http-load-balancer.svg "http(s) load Balancing")
+
+1. A global forwarding rule directs incoming requests to a target HTTP proxy.
+2. The target HTTP proxy checks each request against a URL map to determine the appropriate backend service for the request.
+3. The backend service directs each request to an appropriate backend based on serving capacity, zone, and instance health of its attached backends. The health of each backend instance is verified using an HTTP health check, an HTTPS health check, or an HTTP/2 health check. If the backend service is configured to use an HTTPS or HTTP/2 health check, the request will be encrypted on its way to the backend instance.
+4. Sessions between the load balancer and the instance can use the HTTP, HTTPS, or HTTP/2 protocol. If you use HTTPS or HTTP/2, each instance in the backend services must have an SSL certificate.
