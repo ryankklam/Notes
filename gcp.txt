@@ -130,7 +130,7 @@ https://cloud.google.com/kubernetes-engine/docs/concepts/cluster-autoscaler
 A is correct because this is the way to set up an autoscaling Kubernetes cluster.
 B is not correct because you should not manage the scaling of Kubernetes through the MIG.
 C is not correct because an UMIG cannot scale based on a load balancer and this is not the correct way to set up Kubernetes.
-D is not correct because Kubernetes will not create additional instances when deployed on Compute Engine.
+D is not correct because Kubernetes will not create additional instances when deployed on Compute Engine.x
 
 
 You have an application server running on Compute Engine in the europe-west1-d zone. You need to ensure high availability and replicate the server to the europe-west2-c zone using the fewest steps possible. What should you do?
@@ -247,4 +247,3 @@ https://cloud.google.com/iam/docs/creating-custom-roles
 A is correct because this is the correct console area to view permission assigned to a custom role in a particular project.
 B is not correct because 'gcloud init' will not provide the information required.
 C and D are not correct because these are not the correct areas to view this information
-

@@ -207,6 +207,14 @@ create a health check
 ```sh
 gcloud compute health-checks create tcp my-tcp-health-check \
     --port 80
+
+gcloud compute health-checks create [PROTOCOL] [HEALTH_CHECK_NAME] \
+    --description=[DESCRIPTION] \
+    --check-interval=[CHECK_INTERVAL] \
+    --timeout=[TIMEOUT] \
+    --healthy-threshold=[HEALTHY_THRESHOLD] \
+    --unhealthy-threshold=[UNHEALTHY_THRESHOLD] \
+    ...additional flags    
 ```
 
 create a backend service
@@ -325,33 +333,33 @@ hadoop fs -mkdir testsetup
 
 #### What is a fundamental difference between a snapshot of a boot persistent disk and a custom image?
 1. A snapshot is only for backing up data and cannot be used to create a VM.
-2. A snapshot is locked within a project, but a custom image can be shared between projects.
+#2. A snapshot is locked within a project, but a custom image can be shared between projects.
 3. A custom image can only be used in disaster recovery.
 4. There is no difference, they are different names for the same thing.
 
 
 #### What happens when a custom images is marked "Obsolete" ?
-1. No new projects can use the custom image, but those already with the image can continue to use it.
+#1. No new projects can use the custom image, but those already with the image can continue to use it.
 2. All VMs based on the custom image immediately terminate.
 3. VMs that are based on the custom image continue to run, but cannot be re-launched.
 4. A warning is displayed to new users that the image is no longer supported and will not be maintained or fixed.
 
 
 #### From where can you import boot disk images for Compute Engine (select 3)?
-1. Virtual machines on your local workstation
-2. Your physical datacenter
+#1. Virtual machines on your local workstation
+#2. Your physical datacenter
 3. Google Flash, an online boot disk image storage
-4. Virtual machines that run on another cloud platform
+#4. Virtual machines that run on another cloud platform
 
 
 #### What kinds of files form the Deployment Manager templates?
 1. Templates are composed of yaml, java, and Node.js files.
-2. Templates are composed of yaml, python, and jinja2 files.
-3。 Templates are composed of Powershell, python, and text files.
+#2. Templates are composed of yaml, python, and jinja2 files.
+3. Templates are composed of Powershell, python, and text files.
 4. Templates are composed of bash, yaml, and Angular.js files.
 
 #### What service does Cloud Launcher provide?
-1. Provides pre-packaged 3rd party solutions using Deployment Manager templates.
+#1. Provides pre-packaged 3rd party solutions using Deployment Manager templates.
 2. It is an Android app that sends notifications when new Zones are launched.
 3. Provides 3rd party solutions using the Google Cloud API and bash scripts.
 4. Provides an open source standard alternative to Deployment Manager.
@@ -361,7 +369,7 @@ hadoop fs -mkdir testsetup
 1. They cannot be nested, can use environment variables, but do not have their own properties.
 2. They can be nested, but cannot share data except as passed in an external file.
 3. There can be multiple templates, but they cannot be nested and don't share properties or variables.
-4. They can be nested, have properties, and can use environment variables.
+#4. They can be nested, have properties, and can use environment variables.
 
 #### How are Managed Services useful?
 1. Managed Services are more customizable than infrastructure solutions.
@@ -580,6 +588,35 @@ gsutil rsync -d data gs://mybucket/data  - to make gs://mybucket/data match the 
 gsutil rsync -r data gs://mybucket/data  -  To copy only new/changed files without deleting extra files from gs://mybucket/data leave off the -d option:
 gsutil -m rsync -d -r data gs://mybucket/data  -m option, to perform parallel (multi-threaded/multi-processing) synchronization:
 ```
+
+#### Cloud Storage offers layers of increasingly granular access control. 访问控制选项
+您可以控制谁有权访问您的 Cloud Storage 存储分区和对象，以及他们拥有的权限级别。以下内容总结了您可以使用的访问控制选项，以及可以帮助您详细了解每个选项的链接：
+1. For most purposes, Cloud IAM is sufficient, and roles are inherited from project to bucket to
+object. Identity and Access Management (IAM) 权限：授予存储分区的访问权限以及存储分区中的对象的批量访问权限。IAM 权限使您可以广泛控制项目和存储分区，但不能对单个对象进行精细控制。如需了解特定于 Cloud Storage 的 IAM 权限和角色的参考，以及哪些权限允许用户在存储分区和对象上运行 JSON 和 XML 方法，请参阅“IAM 参考”页面。要了解如何使用 IAM 权限，请参阅使用 IAM 权限。
+2. Access control lists (ACL) offer finer control.访问控制列表 (ACL)：向用户授予各个存储分区或对象的读取或写入权限。在大多数情况下，您应该使用 IAM 权限（而不是 ACL）。仅在需要对单个对象进行精细控制时才使用 ACL。要了解如何使用 ACL，请参阅创建和管理访问控制列表。
+3. Signed URLs provide a cryptographic key that gives time-limited access to a bucket or object. 签名网址（查询字符串身份验证）：通过您生成的网址向用户授予对象的限时读取或写入权限。共享了您提供的网址的任何用户都可以在您指定的时间内访问对象（无论他们是否拥有 Google 帐号）。了解如何创建签名网址：
+```sh
+使用 gsutil signurl 命令，并将私钥（存储在您的计算机上）的路径以及要为其生成签名网址的存储分区或对象的网址传递到此命令中。
+例如，通过使用存储在 Desktop 文件夹中的密钥，以下命令会生成一个签名网址，供用户在 10 分钟的时间内查看对象 cat.jpeg。
+gsutil signurl -d 10m Desktop/private-key.json gs://example-bucket/cat.jpeg
+
+如果成功，响应应如下所示：
+
+URL    HTTP Method    Expiration    Signed URL
+gs://example-bucket/cat.jpeg GET 2016-03-17 11:17:10 https://storage.googleapis.
+com/example-bucket/cat.jpeg?GoogleAccessId=example@example-project.iam.gservicea
+ccount.com&Expires=1458238630&Signature=VVUgfqviDCov%2B%2BKnmVOkwBR2olSbId51kSib
+uQeiH8ucGFyOfAVbH5J%2B5V0gDYIioO2dDGH9Fsj6YdwxWv65HE71VEOEsVPuS8CVb%2BVeeIzmEe8z
+7X7o1d%2BcWbPEo4exILQbj3ROM3T2OrkNBU9sbHq0mLbDMhiiQZ3xCaiCQdsrMEdYVvAFggPuPq%2FE
+QyQZmyJK3ty%2Bmr7kAFW16I9pD11jfBSD1XXjKTJzgd%2FMGSde4Va4J1RtHoX7r5i7YR7Mvf%2Fb17
+zlAuGlzVUf%2FzmhLPqtfKinVrcqdlmamMcmLoW8eLG%2B1yYW%2F7tlS2hvqSfCW8eMUUjiHiSWgZLE
+VIG4Lw%3D%3D
+
+```
+
+4. A signed policy document further refines the control by determining what kind of file can be uploaded by someone with a signed URL.签名政策文档：指定可以上传到存储分区的内容。相比签名网址，政策文档允许用户更好地控制上传大小、内容类型和其他上传特征，并且网站所有者可以使用政策文档来允许访问者将文件上传到 Cloud Storage 中。
+
+
 
 #### You are developing an application that transcodes large video files. Which storage option is the best choice for your application?
 Because video files are blobs and cloud storage is cheap, I would use Google Cloud Storage for this application.
@@ -1082,3 +1119,16 @@ Google Cloud Platform (GCP) 虚拟私有云 (VPC) 网络对等互连允许跨两
 2. The target HTTP proxy checks each request against a URL map to determine the appropriate backend service for the request.
 3. The backend service directs each request to an appropriate backend based on serving capacity, zone, and instance health of its attached backends. The health of each backend instance is verified using an HTTP health check, an HTTPS health check, or an HTTP/2 health check. If the backend service is configured to use an HTTPS or HTTP/2 health check, the request will be encrypted on its way to the backend instance.
 4. Sessions between the load balancer and the instance can use the HTTP, HTTPS, or HTTP/2 protocol. If you use HTTPS or HTTP/2, each instance in the backend services must have an SSL certificate.
+
+gcloud compute instance-groups managed create [NAME] \
+    --base-instance-name [BASE_NAME] \
+    --size [SIZE] \
+    --template [INSTANCE_TEMPLATE] \
+    --zone [ZONE]
+您应该将其中的：
+
+[NAME] 替换为此实例组的名称。
+[BASE_NAME] 替换为要用于在此实例组中创建的实例的名称。由于这些实例完全相同，因此系统会为每个实例分配一个随机字符串，以作为实例名称的一部分。基本名称将作为前缀，后跟此随机字符串。例如，如果基本名称是 example，则实例的名称将是 example-yahs, example-qtyz 等。
+[SIZE] 替换为实例组的大小。
+[INSTANCE_TEMPLATE] 替换为用于该组的实例模板的名称。
+[ZONE] 是支持 Compute Engine 的一个地区。
