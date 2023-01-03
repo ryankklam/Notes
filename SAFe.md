@@ -1,8 +1,9 @@
 # SAFe POPM
 
 ##Product Owner - drives the iteration
->Owns team backlog
->define iteration & storis
->Contribute to Vision,Roadmap,ROI
->Accept iteration increments
->Prioritizes team backlog
+
+1. Owns team backlog
+2. Define iteration & storis
+3. Contribute to Vision,Roadmap,ROI
+4. Accept iteration increments
+5. Prioritizes team backlog
