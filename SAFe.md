@@ -46,7 +46,7 @@
 
 ## Iteration planning
 Best approaches
- - Review and reprioritize the team backlog aheadof iteration planning 
+ - Review and reprioritize the team backlog ahead of iteration planning 
  - Clearly communicate Story details and priorities to ensure understanding and alignment
  - Maintain neutrality as to not influence the team to over commit
  - Prior to Iteration Planning, prepare some preliminary Iteration Goals based on the team¡¯s progress in the PI so far
@@ -60,3 +60,5 @@ Common anti-patterns
  - Product Owner directs the team on how the work should be done
  - The team under commits due to fear of failure
  - No time is reserved for support activities
+
+Iteration goals provide the following benefits: They align the team members and the Product Owner to the mission. They align the people to the Program Increment (PI) Objectives. They provide context for understanding and addressing cross-team dependencies.
