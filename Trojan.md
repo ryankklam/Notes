@@ -1,4 +1,9 @@
-# SAFe POPM
+# TroJan Guide
+
+
+```shell
+sudo -su ##切换超级用户
+```shell
 
 ## 安装基础依赖
 ```shell
