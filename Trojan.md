@@ -1,8 +1,15 @@
 # TroJan Guide
 
+## 配置ec2 inbound rules ， 建议不要accept all traffic
+##### IPv4	HTTPS	TCP	443	0.0.0.0/0
+##### IPv4	HTTP	TCP	80	0.0.0.0/0
+##### IPv4	SSH	    TCP	22	0.0.0.0/0
+
+
+## EC2 trojan 安装
 
 ```shell
-sudo -su ##切换超级用户
+sudo -s ##切换超级用户
 ```shell
 
 ## 安装基础依赖
@@ -50,4 +57,5 @@ wget -N --no-check-certificate "https://raw.githubusercontent.com/V2RaySSR/Troja
 ```shell
 wget -N --no-check-certificate "https://raw.githubusercontent.com/V2RaySSR/Trojansh/master/trojan3.sh" && chmod +x trojan3.sh && ./trojan3.sh
 ```shell
+
 
