@@ -58,4 +58,14 @@ wget -N --no-check-certificate "https://raw.githubusercontent.com/V2RaySSR/Troja
 wget -N --no-check-certificate "https://raw.githubusercontent.com/V2RaySSR/Trojansh/master/trojan3.sh" && chmod +x trojan3.sh && ./trojan3.sh
 ```shell
 
-
+======================请详细阅读下面的说明========================
+==================================================================
+Chrome浏览器地址栏前面若没有小锁，Trojan服务绝对不成功
+Chrome浏览器若是有小锁，Trojan服务绝对正常
+若是客户端不能连接Trojan,请尝试重启Trojan服务
+Trojan服务重启命令：systemctl restart trojan
+==================================================================
+==================================================================
+你的Trojan配置信息存放在：/usr/local/etc/trojan/配置.txt
+==================================================================
+==================================================================
