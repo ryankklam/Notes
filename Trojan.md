@@ -5,6 +5,10 @@
 ##### IPv4	HTTP	TCP	80	0.0.0.0/0
 ##### IPv4	SSH	    TCP	22	0.0.0.0/0
 
+## 前置配置
+去nameslio配置网址vs新ip
+
+
 
 ## EC2 trojan 安装
 
@@ -22,6 +26,9 @@ apt-get install wget   ##Debian Ubuntu 安装 wget
 ```shell
 wget -N --no-check-certificate "https://raw.githubusercontent.com/V2RaySSR/Trojansh/master/trojan1.sh" && chmod +x trojan1.sh && ./trojan1.sh
 ```shell
+
+## 更新账户邮箱
+/root/.acme.sh/acme.sh --register-account -m ryan4299899@gmail.com
 
 ## 申请证书
 ```shell
