@@ -1,42 +1,52 @@
 # TroJan Guide
 
-## ÅäÖÃec2 inbound rules £¬ ½¨Òé²»Òªaccept all traffic
+## é…ç½®ec2 inbound rules ï¼Œ å»ºè®®ä¸è¦accept all traffic
 ##### IPv4	HTTPS	TCP	443	0.0.0.0/0
 ##### IPv4	HTTP	TCP	80	0.0.0.0/0
 ##### IPv4	SSH	    TCP	22	0.0.0.0/0
 
-## Ç°ÖÃÅäÖÃ
-È¥nameslioÅäÖÃÍøÖ·vsĞÂip
+## å‰ç½®é…ç½®
+å»nameslioé…ç½®ç½‘å€vsæ–°ip
+
+## è½¯ä»¶é…ç½®ä»£ç†
+1. å¼€å‘å·¥å…·(å¦‚vscode,trae)é…ç½®gitèµ°ä»£ç†
+git config --global user.name RyanKKLam
+git config --global user.email ryan4299899@126.com
+git config --global http.proxy socks5://127.0.0.1:1080
+git config --global https.proxy socks5://127.0.0.1:1080
+å°† 127.0.0.1:1080 æ›¿æ¢ä¸ºä½ çš„ SOCKS5 ä»£ç†æœåŠ¡å™¨åœ°å€å’Œç«¯å£ã€‚
+2. å–æ¶ˆå…¨å±€ä»£ç†ï¼š
+git config --global --unset http.proxy
+git config --global --unset https.proxy
 
 
 
-## EC2 trojan °²×°
-
+## EC2 trojan å®‰è£…
 ```shell
-sudo -s ##ÇĞ»»³¬¼¶ÓÃ»§
+sudo -s ##åˆ‡æ¢è¶…çº§ç”¨æˆ·
 ```shell
 
-## °²×°»ù´¡ÒÀÀµ
+## å®‰è£…åŸºç¡€ä¾èµ–
 ```shell
-yum -y install wget    ##ContOS Yum °²×° wget
-apt-get install wget   ##Debian Ubuntu °²×° wget
+yum -y install wget    ##ContOS Yum å®‰è£… wget
+apt-get install wget   ##Debian Ubuntu å®‰è£… wget
 ```shell
 
-## °²×°»ù´¡ÒÀÀµ
+## å®‰è£…åŸºç¡€ä¾èµ–
 ```shell
 wget -N --no-check-certificate "https://raw.githubusercontent.com/V2RaySSR/Trojansh/master/trojan1.sh" && chmod +x trojan1.sh && ./trojan1.sh
 ```shell
 
-## ¸üĞÂÕË»§ÓÊÏä
+## æ›´æ–°è´¦æˆ·é‚®ç®±
 /root/.acme.sh/acme.sh --register-account -m ryan4299899@gmail.com
 
-## ÉêÇëÖ¤Êé
+## ç”³è¯·è¯ä¹¦
 ```shell
 wget -N --no-check-certificate "https://raw.githubusercontent.com/V2RaySSR/Trojansh/master/trojan2.sh" && chmod +x trojan2.sh && ./trojan2.sh
 ```shell
 
 
-¿ÉÄÜ»áÓöµ½acmeÉêÇëÖ¤Êé²»³É¹¦µÄÇé¿ö£¬logÓĞÌáÊ¾ÊÇ ¡°Please update your account with an email address first.¡±
+å¯èƒ½ä¼šé‡åˆ°acmeç”³è¯·è¯ä¹¦ä¸æˆåŠŸçš„æƒ…å†µï¼Œlogæœ‰æç¤ºæ˜¯ â€œPlease update your account with an email address first.â€
 [Sun Apr 23 04:23:37 UTC 2023] Installing from online archive.
 [Sun Apr 23 04:23:37 UTC 2023] Downloading https://github.com/acmesh-official/acme.sh/archive/master.tar.gz
 [Sun Apr 23 04:23:38 UTC 2023] Extracting master.tar.gz
@@ -56,23 +66,27 @@ wget -N --no-check-certificate "https://raw.githubusercontent.com/V2RaySSR/Troja
 [Sun Apr 23 04:23:40 UTC 2023] acme.sh --register-account -m my@example.com
 
 
-ĞèÒªÖ´ĞĞ
+éœ€è¦æ‰§è¡Œ
 /root/.acme.sh/acme.sh --register-account -m ryan4299899@gmail.com
 
 
-## BBR¼ÓËÙ
+## BBRåŠ é€Ÿ
 ```shell
 wget -N --no-check-certificate "https://raw.githubusercontent.com/V2RaySSR/Trojansh/master/trojan3.sh" && chmod +x trojan3.sh && ./trojan3.sh
 ```shell
 
-======================ÇëÏêÏ¸ÔÄ¶ÁÏÂÃæµÄËµÃ÷========================
+======================è¯·è¯¦ç»†é˜…è¯»ä¸‹é¢çš„è¯´æ˜========================
 ==================================================================
-Chromeä¯ÀÀÆ÷µØÖ·À¸Ç°ÃæÈôÃ»ÓĞĞ¡Ëø£¬Trojan·şÎñ¾ø¶Ô²»³É¹¦
-Chromeä¯ÀÀÆ÷ÈôÊÇÓĞĞ¡Ëø£¬Trojan·şÎñ¾ø¶ÔÕı³£
-ÈôÊÇ¿Í»§¶Ë²»ÄÜÁ¬½ÓTrojan,Çë³¢ÊÔÖØÆôTrojan·şÎñ
-Trojan·şÎñÖØÆôÃüÁî£ºsystemctl restart trojan
-==================================================================
-==================================================================
-ÄãµÄTrojanÅäÖÃĞÅÏ¢´æ·ÅÔÚ£º/usr/local/etc/trojan/ÅäÖÃ.txt
+Chromeæµè§ˆå™¨åœ°å€æ å‰é¢è‹¥æ²¡æœ‰å°é”ï¼ŒTrojanæœåŠ¡ç»å¯¹ä¸æˆåŠŸ
+Chromeæµè§ˆå™¨è‹¥æ˜¯æœ‰å°é”ï¼ŒTrojanæœåŠ¡ç»å¯¹æ­£å¸¸
+è‹¥æ˜¯å®¢æˆ·ç«¯ä¸èƒ½è¿æ¥Trojan,è¯·å°è¯•é‡å¯TrojanæœåŠ¡
+TrojanæœåŠ¡é‡å¯å‘½ä»¤ï¼šsystemctl restart trojan
 ==================================================================
 ==================================================================
+ä½ çš„Trojané…ç½®ä¿¡æ¯å­˜æ”¾åœ¨ï¼š/usr/local/etc/trojan/é…ç½®.txt
+==================================================================
+==================================================================
+
+
+
+
