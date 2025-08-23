@@ -1,12 +1,15 @@
 # TroJan Guide
 
-## 配置ec2 inbound rules ， 建议不要accept all traffic
+## 前置配置 
+创建ec2实例之前，先去申请弹性ip,有这个ip就可以去nameslio配置网址vs新ip
+nameslio ip mapping需要时间， 这样后面等的时间就不用那么长 
+
+## 配置ec2 inbound rules ， 建议不要accept all traffic (SSH没连上通常都是没配置好ssh的inbound rule)
 ##### IPv4	HTTPS	TCP	443	0.0.0.0/0
 ##### IPv4	HTTP	TCP	80	0.0.0.0/0
 ##### IPv4	SSH	    TCP	22	0.0.0.0/0
 
-## 前置配置
-去nameslio配置网址vs新ip
+
 
 ## 软件配置代理
 1. 开发工具(如vscode,trae)配置git走代理

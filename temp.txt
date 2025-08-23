@@ -24,3 +24,14 @@ VM primary 10.1.0.2 , allocate from subnet1
 
 Alias IP range - 10.2.1.0/24
 00001010000000100000000100000000
+
+你的Trojan配置信息为：
+域名：www.ryankklam.top
+密码：d4541132
+端口：443
+若需修改密码或忘记密码
+请访问VPS: /usr/local/etc/trojan/config.json
+推荐Win客户端下载：https://www.v2rayssr.com/trojanwin.html
+推荐安卓客户端软件：https://github.com/apache/ignite/releases
+MacOS和IOS太高端，请自行选择 Trojan 客户端 
+
